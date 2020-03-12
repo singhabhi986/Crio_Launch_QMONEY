@@ -1,0 +1,1 @@
+curl "https://api.tiingo.com/tiingo/daily/AAPL/prices?startDate=2020-1-1&endDate=2020-2-1&token=f0f7d3f3ae00a5dae7ec73c6ab65d787b6de3d15"
