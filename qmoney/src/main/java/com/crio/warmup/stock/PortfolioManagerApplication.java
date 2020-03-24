@@ -1,17 +1,19 @@
 package com.crio.warmup.stock;
 
-import com.crio.warmup.stock.dto.AnnualizedReturn; //do it again
+import com.crio.warmup.stock.dto.AnnualizedReturn;
 import com.crio.warmup.stock.dto.PortfolioTrade;
 import com.crio.warmup.stock.dto.TiingoCandle;
 import com.crio.warmup.stock.dto.TotalReturnsDto;
 import com.crio.warmup.stock.log.UncaughtExceptionHandler;
+import com.crio.warmup.stock.portfolio.PortfolioManager;
+import com.crio.warmup.stock.portfolio.PortfolioManagerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+//import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -22,13 +24,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
+//import java.util.logging.Level;
+//import java.util.stream.Collectors;
 import org.apache.logging.log4j.ThreadContext;
 import org.springframework.web.client.RestTemplate;
 
 public class PortfolioManagerApplication {
 
-  // TODO: CRIO_TASK_MODULE_JSON_PARSING.
+  // TODO: CRIO_TASK_MODULE_JSON_PARSING.(M-1)
   // Read the json file provided in the argument[0]. The file will be avilable in
   // the classpath.
   // 1. Use #resolveFileFromResources to get actual file from classpath.
@@ -75,7 +78,7 @@ public class PortfolioManagerApplication {
     return objectMapper;
   }
 
-  // TODO: CRIO_TASK_MODULE_JSON_PARSING
+  // TODO: CRIO_TASK_MODULE_JSON_PARSING(M-1)
   // Follow the instructions provided in the task documentation and fill up the
   // correct values for
   // the variables provided. First value is provided for your reference.
@@ -124,7 +127,7 @@ public class PortfolioManagerApplication {
         functionNameFromTestFileInStackTrace, lineNumberFromTestFileInStackTrace });
   }
 
-  // TODO: CRIO_TASK_MODULE_REST_API
+  // TODO: CRIO_TASK_MODULE_REST_API(M-2)
   // Copy the relavent code from #mainReadFile to parse the Json into
   // PortfolioTrade list.
   // Now That you have the list of PortfolioTrade already populated in module#1
@@ -187,7 +190,7 @@ public class PortfolioManagerApplication {
     return collections;
   }
 
-  // TODO: CRIO_TASK_MODULE_CALCULATIONS
+  // TODO: CRIO_TASK_MODULE_CALCULATIONS(M-3)
   // Copy the relevant code from #mainReadQuotes to parse the Json into
   // PortfolioTrade list and
   // Get the latest quotes from TIingo.
@@ -259,7 +262,7 @@ public class PortfolioManagerApplication {
     return ar;
   }
 
-  // TODO: CRIO_TASK_MODULE_CALCULATIONS
+  // TODO: CRIO_TASK_MODULE_CALCULATIONS(M-3)
   // annualized returns should be calculated in two steps -
   // 1. Calculate totalReturn = (sell_value - buy_value) / buy_value
   // Store the same as totalReturns
@@ -288,11 +291,46 @@ public class PortfolioManagerApplication {
     return new AnnualizedReturn(trade.getSymbol(), annualizedreturns, totalreturns);
   }
 
+
+
+  // TODO: CRIO_TASK_MODULE_REFACTOR(M-4)
+  //  Once you are done with the implementation inside PortfolioManagerImpl and
+  //  PortfolioManagerFactory,
+  //  Create PortfolioManager using PortfoliomanagerFactory,
+  //  Refer to the code from previous modules to get the List<PortfolioTrades> and endDate, and
+  //  call the newly implemented method in PortfolioManager to calculate the annualized returns.
+  //  Test the same using the same commands as you used in module 3
+  //  use gralde command like below to test your code
+  //  ./gradlew run --args="trades.json 2020-01-01"
+  //  ./gradlew run --args="trades.json 2019-07-01"
+  //  ./gradlew run --args="trades.json 2019-12-03"
+  //  where trades.json is your json file
+  //  Confirm that you are getting same results as in Module3.
+
+  public static List<AnnualizedReturn> mainCalculateReturnsAfterRefactor(String[] args)
+      throws Exception {
+
+
+
+    File file = resolveFileFromResources(args[0]);
+    LocalDate endDate = LocalDate.parse(args[1]);
+    PortfolioManagerFactory pf = new PortfolioManagerFactory();
+    RestTemplate restTemplate = new RestTemplate();
+    PortfolioManager portfolioManager = pf.getPortfolioManager(restTemplate);
+    ObjectMapper objectMapper = getObjectMapper();
+    PortfolioTrade[] portfolioTrades = objectMapper.readValue(file, PortfolioTrade[].class);
+    return portfolioManager.calculateAnnualizedReturn(Arrays.asList(portfolioTrades), endDate);
+  }
+
+
+
   public static void main(String[] args) throws Exception {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     ThreadContext.put("runId", UUID.randomUUID().toString());
-    printJsonObject(mainCalculateSingleReturn(args));
 
+
+
+
+    printJsonObject(mainCalculateReturnsAfterRefactor(args));
   }
-
-} 
+}
