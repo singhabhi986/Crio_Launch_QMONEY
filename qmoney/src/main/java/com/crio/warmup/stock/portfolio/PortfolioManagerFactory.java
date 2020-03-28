@@ -1,4 +1,3 @@
-
 package com.crio.warmup.stock.portfolio;
 
 import org.springframework.web.client.RestTemplate;
@@ -9,6 +8,7 @@ public class PortfolioManagerFactory {
   // Implement the method in such a way that it will return new Instance of
   // PortfolioManager using RestTemplate provided.
   public static PortfolioManager getPortfolioManager(RestTemplate restTemplate) {
+    
     PortfolioManager pm = new PortfolioManagerImpl(restTemplate);
     return pm;
   }

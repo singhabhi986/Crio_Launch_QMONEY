@@ -309,18 +309,18 @@ public class PortfolioManagerApplication {
 
   public static List<AnnualizedReturn> mainCalculateReturnsAfterRefactor(String[] args)
       throws Exception {
-
-
-
-    File file = resolveFileFromResources(args[0]);
     LocalDate endDate = LocalDate.parse(args[1]);
     PortfolioManagerFactory pf = new PortfolioManagerFactory();
     RestTemplate restTemplate = new RestTemplate();
     PortfolioManager portfolioManager = pf.getPortfolioManager(restTemplate);
-    ObjectMapper objectMapper = getObjectMapper();
-    PortfolioTrade[] portfolioTrades = objectMapper.readValue(file, PortfolioTrade[].class);
+
+    //String date = args[1];
+    ObjectMapper objM = getObjectMapper();
+    File file = resolveFileFromResources(args[0]);
+    PortfolioTrade[] portfolioTrades = objM.readValue(file, PortfolioTrade[].class);
     return portfolioManager.calculateAnnualizedReturn(Arrays.asList(portfolioTrades), endDate);
   }
+
 
 
 
@@ -328,9 +328,7 @@ public class PortfolioManagerApplication {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     ThreadContext.put("runId", UUID.randomUUID().toString());
 
-
-
-
     printJsonObject(mainCalculateReturnsAfterRefactor(args));
   }
 }
+
